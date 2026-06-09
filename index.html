@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dove e Quando?</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app-shell">
+
+    <!-- ═══ START ═══ -->
+    <section class="hero" id="startScreen">
+      <div class="hero-copy">
+        <p class="eyebrow">Addio al celibato</p>
+        <h1>Dove e Quando?</h1>
+        <p>
+          Ogni foto racconta un momento della sua vita. Indovina l'anno e segna sulla mappa
+          dove è stata scattata. Più sei preciso, più punti guadagni.
+        </p>
+
+        <div class="interface-preview" aria-label="Guida dell'interfaccia">
+          <div class="preview-rail">
+            <div class="preview-tile is-highlighted">
+              <span>Punteggio</span>
+              <strong>7 240</strong>
+            </div>
+            <div class="preview-tile">
+              <span>Anno (max)</span>
+              <strong>5 000</strong>
+            </div>
+            <div class="preview-tile">
+              <span>Luogo (max)</span>
+              <strong>5 000</strong>
+            </div>
+          </div>
+          <div class="preview-stage">
+            <span class="tour-note">Anno: fino a 5 000 pt — ogni anno di errore costa 200.</span>
+            <span class="tour-note">Luogo: fino a 5 000 pt — ogni km di distanza costa 5.</span>
+            <span class="tour-note">Clicca la mappa per il pin, poi conferma. Vedrai dov'era davvero.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="start-panel">
+        <div class="rule-list">
+          <div>
+            <strong id="foundPhotos">—</strong>
+            <span>foto trovate</span>
+          </div>
+          <div>
+            <strong>+5 000</strong>
+            <span>punti max per l'anno</span>
+          </div>
+          <div>
+            <strong>+5 000</strong>
+            <span>punti max per il luogo</span>
+          </div>
+          <div>
+            <strong>×N</strong>
+            <span>foto giocate in sequenza</span>
+          </div>
+        </div>
+        <button id="startButton" type="button">Inizia il gioco</button>
+        <p id="setupHint">Carico la lista foto da data/photos.json</p>
+      </div>
+    </section>
+
+    <!-- ═══ GAME ═══ -->
+    <section id="gameScreen" class="game-layout hidden" aria-live="polite">
+      <aside class="status-rail">
+        <div class="score-tile primary">
+          <span>Punteggio totale</span>
+          <strong id="score">0</strong>
+        </div>
+        <div class="score-tile">
+          <span>Foto</span>
+          <strong id="photoCounter">1 / 1</strong>
+        </div>
+
+        <div class="progress-block">
+          <div>
+            <span id="progressLabel" style="color:var(--muted);font-size:.9rem">0%</span>
+          </div>
+          <div class="progress-bar">
+            <div id="progressFill"></div>
+          </div>
+        </div>
+
+        <div id="resultPanel" class="result-panel hidden">
+          <div class="result-row">
+            <span>Anno reale</span>
+            <strong id="actualYear">—</strong>
+          </div>
+          <div class="result-row">
+            <span>Tuo anno</span>
+            <strong id="guessedYearEl">—</strong>
+          </div>
+          <div class="result-row accent">
+            <span>Punti anno</span>
+            <strong id="yearScoreEl">+0</strong>
+          </div>
+          <div class="result-hr"></div>
+          <div class="result-row">
+            <span>Distanza</span>
+            <strong id="distanceKmEl">—</strong>
+          </div>
+          <div class="result-row accent">
+            <span>Punti luogo</span>
+            <strong id="locScoreEl">+0</strong>
+          </div>
+          <div class="result-hr"></div>
+          <div class="result-row total">
+            <span>Questa foto</span>
+            <strong id="roundScoreEl">+0</strong>
+          </div>
+        </div>
+      </aside>
+
+      <section class="quiz-stage">
+        <div class="photo-card">
+          <p class="eyebrow" id="photoLabel">Foto 1</p>
+          <div class="photo-frame">
+            <img id="photoImg" src="" alt="Foto" />
+          </div>
+        </div>
+
+        <div class="guess-panel">
+          <div class="year-block">
+            <div class="year-header">
+              <span class="eyebrow">Anno</span>
+              <strong id="yearDisplay" class="year-number">2005</strong>
+            </div>
+            <input type="range" id="yearSlider" class="year-slider" min="1980" max="2025" value="2005" />
+            <div class="year-ticks">
+              <span>1980</span>
+              <span>2025</span>
+            </div>
+          </div>
+
+          <div class="map-block">
+            <span class="eyebrow">Luogo — clicca per posizionare il pin</span>
+            <div id="map"></div>
+          </div>
+
+          <div class="feedback-row">
+            <p id="feedback" class="feedback-text">Scegli l'anno e posiziona il pin sulla mappa.</p>
+            <div class="action-buttons">
+              <button id="confirmButton" type="button" disabled>Conferma</button>
+              <button id="nextButton" type="button" class="secondary hidden">Prossima foto</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <!-- ═══ FINAL ═══ -->
+    <section id="finalScreen" class="final hidden">
+      <p class="eyebrow">Risultato finale</p>
+      <h2>Viaggio completato</h2>
+      <div class="final-score">
+        <span id="finalScore">0</span>
+        <small id="finalMax">/ 0</small>
+      </div>
+      <p id="finalMessage"></p>
+      <button id="restartButton" type="button">Ricomincia</button>
+    </section>
+
+  </main>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
