@@ -85,6 +85,8 @@ async function startGame() {
       return;
     }
 
+    shuffle(photos);
+
     currentIndex = 0;
     totalScore = 0;
 
@@ -276,6 +278,13 @@ function calcYearScore(guessYear, realYear) {
 
 function calcLocScore(distKm) {
   return Math.max(0, Math.round(MAX_LOC_SCORE - distKm * LOC_PENALTY_PER_KM));
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
 }
 
 function haversine(lat1, lon1, lat2, lon2) {
